@@ -22,7 +22,12 @@ const callbackServer = (req, res) => {
             buffer = JSON.parse(buffer);
         }
 
+        if(path.indexOf('/') >= -1){
+            var [path, index] = path.split('/');
+        }
+
         const data = {
+            index,
             path,
             query,
             method,
@@ -49,7 +54,11 @@ const router = {
     },
     users: {
         GET: (data, callback) => {
-            callback(200, userList);
+            if(data.index){
+                if(userList[data.index]) return callback(200, userList[data.index]);
+                else return callback(404, {message: `usuario ${index} no encontrado`})
+            }
+            else return callback(200, userList);
         },
         POST: (data, callback) => {
             userList.push(data.payload);
@@ -57,7 +66,7 @@ const router = {
         }
     },
     notFound: (data, callback) => {
-        callback(404, {messaje: 'pagina no encontrada'})
+        callback(404, {message: 'pagina no encontrada'})
     }
 }
 
