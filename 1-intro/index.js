@@ -1,17 +1,17 @@
 const http = require('http');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
+const router = require('./router');
 
 const callbackServer = (req, res) => {
     const urlParsed = url.parse(req.url, true);
     
     //Desglozamiento del url
-    const path = urlParsed.pathname.replace(/^\/+|\/+$/g, '');
+    var path = urlParsed.pathname.replace(/^\/+|\/+$/g, '');
     const method = req.method.toUpperCase();
     const { query = {} } = urlParsed;
     const { headers = {} } = req;
 
-    // METHOD PUT, Recibir datos por stream
     const decoder = new StringDecoder('utf-8');
     let buffer = '';
     req.on('data', (data) => buffer += decoder.write(data));
@@ -21,14 +21,12 @@ const callbackServer = (req, res) => {
         if(headers["content-type"] === "application/json"){
             buffer = JSON.parse(buffer);
         }
-
-        if(path.indexOf('/') >= -1){
-            var [path, index] = path.split('/');
-        }
+        
+        if(path.indexOf("/") >= -1) var [path2, index] = path.split("/");
 
         const data = {
+            path: path2 || path,
             index,
-            path,
             query,
             method,
             headers,
@@ -36,7 +34,7 @@ const callbackServer = (req, res) => {
         };
 
         let handler;
-        if(path && router[path] && router[path][method]) handler = router[path][method];
+        if(data.path && router[data.path] && router[data.path][method]) handler = router[data.path][method];
         else handler = router.notFound;
 
         handler(data, (status = 200, messaje) => {
@@ -48,28 +46,6 @@ const callbackServer = (req, res) => {
     });
 };
 
-const router = {
-    ruta: (data, callback) => {
-        callback(200, {messaje: '/ruta'})
-    },
-    users: {
-        GET: (data, callback) => {
-            if(data.index){
-                if(userList[data.index]) return callback(200, userList[data.index]);
-                else return callback(404, {message: `usuario ${index} no encontrado`})
-            }
-            else return callback(200, userList);
-        },
-        POST: (data, callback) => {
-            userList.push(data.payload);
-            callback(201, data.payload);
-        }
-    },
-    notFound: (data, callback) => {
-        callback(404, {message: 'pagina no encontrada'})
-    }
-}
-
 const server = http.createServer(callbackServer);
 
 server.on('clientError', (err, socket) => {
@@ -78,8 +54,3 @@ server.on('clientError', (err, socket) => {
 
 server.listen(8000, () => console.log('Server is ON in http://localhost:8000/'));
 
-let userList = [
-    {username: 'nacho', age: 22}, 
-    {username: 'juan', age: 19},
-    {username: 'paloma', age: 14}
-]
