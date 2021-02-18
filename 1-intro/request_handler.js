@@ -8,6 +8,17 @@ module.exports = (req, res) => {
     //Desglozamiento del url
     var path = urlParsed.pathname.replace(/^\/+|\/+$/g, '');
     const method = req.method.toUpperCase();
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Request-Methods", "*");
+    res.setHeader("Access-Control-Allow-Headers", "*");
+
+    if(method === 'OPTIONS') {
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
     const { query = {} } = urlParsed;
     const { headers = {} } = req;
 
