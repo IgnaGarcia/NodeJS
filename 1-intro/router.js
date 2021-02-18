@@ -1,33 +1,8 @@
-module.exports = {
-    ruta: (data, callback) => {
-        callback(200, {messaje: '/ruta'})
-    },
-    users: {
-        GET: (data, callback) => {
-            if(data.index){
-                if(userList[data.index]) return callback(200, userList[data.index]);
-                else return callback(404, {message: `usuario ${data.index} no encontrado`})
-            }
-            else return callback(200, userList);
-        },
-        POST: (data, callback) => {
-            userList.push(data.payload);
-            callback(201, data.payload);
-        },
-        PUT: (data, callback) => {
-            if(data.index){
-                if(userList[data.index]) {
-                    userList[data.index] = data.payload;
-                    return callback(200, userList[data.index]);
-                }
-                else return callback(404, {message: `usuario ${data.index} no encontrado`})
-            }
-            else return callback(400, {message: "indice no enviado"});
-        }
-    },
-    notFound: (data, callback) => {
-        callback(404, {message: 'pagina no encontrada'})
-    }
-}
-
+const users = require('./routes/users');
 let userList = require('./data').users;
+
+module.exports = {
+    users: users(userList),
+    ruta: (data, callback) => callback(200, {messaje: '/ruta'}),
+    notFound: (data, callback) => callback(404, {message: 'pagina no encontrada'})
+}
