@@ -20,8 +20,4 @@ module.exports = {
     }
 }
 
-let userList = [
-    {username: 'nacho', age: 22}, 
-    {username: 'juan', age: 19},
-    {username: 'paloma', age: 14}
-]
+let userList = require('./data').users;
