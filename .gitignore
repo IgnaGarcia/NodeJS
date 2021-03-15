@@ -2,3 +2,4 @@
 3-mongo/node_modules/
 4-GraphQL/node_modules/
 *node_modules/
+.vscode/
